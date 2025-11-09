@@ -1,0 +1,29 @@
+{
+  "nike": {
+    "brand_name": "Nike",
+    "official_logos": ["nike_swoosh.png"],
+    "color_palette_hex": ["#000000", "#FFFFFF", "#FF6600"],
+    "typography": ["Futura", "Helvetica"],
+    "tone_of_voice_keywords": ["inspirational", "athletic", "performance", "empowering", "bold"],
+    "taglines": ["Just Do It"],
+    "safety_rules": ["Avoid any depiction of unsafe athletic activities, glorify struggle without resolution, or show disrespect to competitors."]
+  },
+  "cocacola": {
+    "brand_name": "Coca-Cola",
+    "official_logos": ["coca_cola_logo.png"],
+    "color_palette_hex": ["#F40009", "#FFFFFF"],
+    "typography": ["Spoon", "Futura"],
+    "tone_of_voice_keywords": ["happiness", "togetherness", "refreshing", "optimism"],
+    "taglines": ["Taste the Feeling", "Open Happiness"],
+    "safety_rules": ["Avoid showing excessive sugar consumption or associating the product with unhealthy lifestyles."]
+  },
+  "apple": {
+    "brand_name": "Apple",
+    "official_logos": ["apple_bitten.png"],
+    "color_palette_hex": ["#000000", "#FFFFFF", "#A2AAAD"],
+    "typography": ["San Francisco"],
+    "tone_of_voice_keywords": ["innovative", "sleek", "minimalist", "premium", "intuitive"],
+    "taglines": ["Think Different", "Innovation"],
+    "safety_rules": ["Maintain minimalist aesthetic. Avoid cluttered designs. Do not misrepresent product capabilities."]
+  }
+}
