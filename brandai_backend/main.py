@@ -170,7 +170,7 @@ def regenerate_ad_with_imagen(refined_prompt: str) -> str:
         # These are passed to the 'parameters' field in the underlying REST API.
         # The Python SDK maps the 'generation_config' dict to these parameters.
         generation_parameters = {
-            "number_of_images": 1,
+            "candidate_count": 1,
             "aspectRatio": "1:1",
             "addWatermark": False,
             "safetySetting": "block_only_high"
