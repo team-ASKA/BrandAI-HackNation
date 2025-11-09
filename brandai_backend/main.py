@@ -163,16 +163,36 @@ def regenerate_ad_with_imagen(refined_prompt: str) -> str:
     Generates a new ad image using Imagen on Vertex AI.
     """
     try:
-        model = GenerativeModel("imagegeneration@006")
-        response = model.generate_content(refined_prompt, generation_config={"candidate_count": 1})
+        # Using a specific, modern model version is better practice.
+        model = GenerativeModel("imagen-3.0-generate-001")
+        
+        # Correctly structured parameters based on the official documentation.
+        # These are passed to the 'parameters' field in the underlying REST API.
+        # The Python SDK maps the 'generation_config' dict to these parameters.
+        generation_parameters = {
+            "sampleCount": 1,
+            "aspectRatio": "1:1",
+            "addWatermark": False,
+            "safetySetting": "block_only_high"
+        }
+        
+        response = model.generate_content(
+            [refined_prompt],
+            generation_config=generation_parameters
+        )
+        
         if not response.candidates:
             raise Exception("Imagen returned no image candidates.")
+
         image_part = response.candidates[0].content.parts[0]
+        
         if image_part.mime_type not in ["image/png", "image/jpeg"]:
             raise Exception(f"Unexpected MIME type from Imagen: {image_part.mime_type}")
+
         image_bytes = image_part.data
         encoded_string = base64.b64encode(image_bytes).decode('utf-8')
         return f"data:image/png;base64,{encoded_string}"
+
     except Exception as e:
         print(f"Error calling Imagen API: {e}")
         raise Exception(f"Google Imagen API failed: {e}")
