@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from vertexai.preview.vision_models import ImageGenerationModel
 
 # Google Cloud Imports
 import vertexai
@@ -160,42 +161,36 @@ def get_critique_and_refinement_with_gemini(image_bytes: bytes, brand_kit: dict,
 
 def regenerate_ad_with_imagen(refined_prompt: str) -> str:
     """
-    Generates a new ad image using Imagen on Vertex AI.
+    Generates a new ad image using the dedicated ImageGenerationModel for Imagen.
+    This is the stable and recommended method for this task.
     """
     try:
-        # Using a specific, modern model version is better practice.
-        model = GenerativeModel("imagen-3.0-generate-001")
-        
-        # Correctly structured parameters based on the official documentation.
-        # These are passed to the 'parameters' field in the underlying REST API.
-        # The Python SDK maps the 'generation_config' dict to these parameters.
-        generation_parameters = {
-            "candidate_count": 1,
-            "aspectRatio": "1:1",
-            "addWatermark": False,
-            "safetySetting": "block_only_high"
-        }
-        
-        response = model.generate_content(
-            [refined_prompt],
-            generation_config=generation_parameters
+        # Use the dedicated model class for image generation
+        model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
+
+        # Call the generate_images method with direct parameters
+        # This avoids all the GenerationConfig issues.
+        response = model.generate_images(
+            prompt=refined_prompt,
+            number_of_images=1,      # This is the correct parameter name for this class
+            aspect_ratio="1:1",      # This is also the correct parameter name
+            add_watermark=False,
+            safety_filter_level='block_some'
         )
-        
-        if not response.candidates:
+
+        if not response.images:
             raise Exception("Imagen returned no image candidates.")
 
-        image_part = response.candidates[0].content.parts[0]
+        # The response object is simpler with this class
+        image_bytes = response.images[0]._image_bytes
         
-        if image_part.mime_type not in ["image/png", "image/jpeg"]:
-            raise Exception(f"Unexpected MIME type from Imagen: {image_part.mime_type}")
-
-        image_bytes = image_part.data
         encoded_string = base64.b64encode(image_bytes).decode('utf-8')
         return f"data:image/png;base64,{encoded_string}"
 
     except Exception as e:
         print(f"Error calling Imagen API: {e}")
-        raise Exception(f"Google Imagen API failed: {e}")
+        # Re-raise the exception to be caught by the main endpoint handler
+        raise Exception(f"An internal error occurred: Google Imagen API failed: {e}")
 
 
 # === MAIN API ENDPOINTS ===
